@@ -6,11 +6,15 @@ const createRecords = async (req, res) => {
   let tokenHeader = req.headers["auth-token"];
   let jwtResult = await jwtDecode(tokenHeader);
   const loggedUser = await authUser.findOne({ _id: jwtResult.id });
+  if (!loggedUser) {
+    return res.status(404).send("Access Denied, Please check Token");
+  }
   const User = new recordsDB({
     status: req.body.status,
     task: req.body.task,
-    devId: jwtResult.id,
-    manager: loggedUser.manager,
+    devId: { id: jwtResult.id, name: loggedUser.name },
+    manager: { id: loggedUser.manager.id, name: loggedUser.manager.name },
+    createdAt: Date.now(),
   });
 
   try {
@@ -24,16 +28,18 @@ const createRecords = async (req, res) => {
 const getRecords = async (req, res) => {
   let tokenHeader = req.headers["auth-token"];
   let jwtResult = await jwtDecode(tokenHeader);
+
   const loggedUser = await authUser.findOne({ _id: jwtResult.id, v: 0 });
+  console.log(loggedUser, "ppppppppppp", jwtResult);
+  if (!loggedUser) {
+    return res.status(404).send("Access Denied, Please check Token");
+  }
   if (loggedUser.role === "dev") {
-    let results = await recordsDB.find(
-      { devId: loggedUser._id },
-      { manager: 0 }
-    );
+    let results = await recordsDB.find({ "devId.id": loggedUser.id });
     return res.status(200).send(results);
   } else {
     let results = await recordsDB.find(
-      { manager: loggedUser._id },
+      { "manager.id": loggedUser.id },
       { manager: 0 }
     );
     return res.status(200).send(results);
