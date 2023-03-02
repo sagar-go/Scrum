@@ -1,87 +1,66 @@
 import React from "react";
 import { Field, Form } from "react-final-form";
-import Select from "react-select";
+import { useDispatch, useSelector } from "react-redux";
+import { userLogin } from "../features/actions/authActions";
 
 const Login = () => {
-  const options = [
-    { value: "Developer", label: "Developer" },
-    { value: "Team lead", label: "Team lead" },
-  ];
+  const dispatch = useDispatch();
+
+  //  const userLogin = useSelector((state) => state?.authData?.)
 
   const onSubmit = (values) => {
-    console.log(values);
+    console.log(values, "fffffff");
+
+    dispatch(
+      userLogin({
+        email: "mitesh2@gmail.com",
+        password: "1",
+      })
+    );
   };
 
   return (
     <div>
-      <h2>Sign up</h2>
+      <h3>Login</h3>
       <div>
         <Form
           onSubmit={onSubmit}
           validate={(values) => {
             const error = {};
-            if (!values.username) {
-              error["username"] = "username required!";
-            }
             if (!values.email) {
               error["email"] = "email required!";
             }
             if (!values.password) {
               error["password"] = "password required!";
             }
-            if (!values.role) {
-              error.role = "select your role";
-            }
-            return error;
           }}
-          render={({ handleSubmit, values }) => (
+          render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit}>
-              <Field name="username">
+              <Field name="email">
                 {({ input, meta }) => (
                   <div>
-                    <label>Name: </label>
-                    <input {...input} type="text" placeholder="username" />
+                    <label>Email: </label>
+                    <input {...input} type="text" placeholder="email" />
                     {meta.error && meta.touched && <span>{meta.error}</span>}
                   </div>
                 )}
               </Field>
               <div>
-                <Field name="email">
-                  {({ input, meta }) => (
-                    <div>
-                      <label>Email: </label>
-                      <input {...input} type="text" placeholder="email" />
-                      {meta.error && meta.touched && <span>{meta.error}</span>}
-                    </div>
-                  )}
-                </Field>
-              </div>
-              <div>
                 <Field name="password">
                   {({ input, meta }) => (
                     <div>
                       <label>Password: </label>
-                      <input {...input} type="number" placeholder="password" />
-                      {meta.error && meta.touched && <span>{meta.error}</span>}
-                    </div>
-                  )}
-                </Field>
-              </div>
-              <div className="select">
-                <Field name="role">
-                  {({ input, meta }) => (
-                    <div>
-                      <Select
+                      <input
                         {...input}
-                        placeholder="select your role"
-                        options={options}
+                        type="password"
+                        placeholder="password"
                       />
                       {meta.error && meta.touched && <span>{meta.error}</span>}
                     </div>
                   )}
                 </Field>
               </div>
-              <button type="submit">Submit</button>
+              <button type="submit">Login</button>
             </form>
           )}
         />
@@ -89,5 +68,4 @@ const Login = () => {
     </div>
   );
 };
-
 export default Login;
