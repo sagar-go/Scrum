@@ -6,7 +6,7 @@ const jwtDecode = (token) => {
 };
 
 const roles = {
-  teamLead: "teamLead",
+  manager: "manager",
   dev: "dev",
 };
 

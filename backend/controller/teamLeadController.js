@@ -2,7 +2,7 @@ const authUser = require("../models/auth");
 const { jwtDecode } = require("../utils/util");
 
 const getLeadDetails = async (req, res) => {
-  const list = await authUser.find({ role: req.body.role }, { email: 1 });
+  const list = await authUser.find({ role: req.body.role }, { name: 1 });
   if (list) {
     return res.send(list);
   }

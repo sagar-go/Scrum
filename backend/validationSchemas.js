@@ -5,7 +5,7 @@ const signUpSchema = Joi.object({
   password: Joi.string().required(),
   role: Joi.string().required(),
   name: Joi.string().required(),
-  manager: Joi.string(),
+  manager: Joi.object(),
 });
 
 const loginSchema2 = Joi.object({

@@ -6,6 +6,7 @@ const { jwtDecode, roles } = require("../utils/util");
 
 const authRegister = async (req, res) => {
   const { error } = signUpSchema.validate(req.body);
+  console.log(req.body.manager, "uiououio");
 
   if (error) {
     return res.status(400).send(error.details[0].message);
@@ -31,13 +32,15 @@ const authRegister = async (req, res) => {
     password: hashpassword,
     role: req.body.role,
     name: req.body.name,
-    manager: req.body.manager ? req.body.manager : null,
+    manager: req.body.manager
+      ? { id: req.body.manager.id, name: req.body.manager.name }
+      : null,
     token: null,
   });
 
   try {
     await User.save();
-    res.status(400).send({ message: "User created successfully" });
+    res.status(200).send({ message: "User created successfully", user: User });
   } catch (error) {
     res.status(404).send("Some Error Occured");
   }

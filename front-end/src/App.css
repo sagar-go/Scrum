@@ -2,6 +2,17 @@
   text-align: center;
 }
 
+.select {
+  width: 200px;
+  /* margin-left: 670px; */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
