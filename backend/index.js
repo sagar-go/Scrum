@@ -18,5 +18,4 @@ mongoose
 
 app.use("/auth", authRoute);
 app.use("/records", recordsRoute);
-
 app.listen(4000, (req, res) => console.log("SERVER IS RUNNING !!!!!!!!!!!!"));

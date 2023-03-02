@@ -6,7 +6,6 @@ const { jwtDecode, roles } = require("../utils/util");
 
 const authRegister = async (req, res) => {
   const { error } = signUpSchema.validate(req.body);
-  console.log(req.body.manager, "uiououio");
 
   if (error) {
     return res.status(400).send(error.details[0].message);
@@ -32,15 +31,39 @@ const authRegister = async (req, res) => {
     password: hashpassword,
     role: req.body.role,
     name: req.body.name,
-    manager: req.body.manager
-      ? { id: req.body.manager.id, name: req.body.manager.name }
-      : null,
+    manager: req.body.manager ? req.body.manager : null,
     token: null,
+  });
+
+  var transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: "sagarrbarthwal@gmail.com",
+      pass: "gfcntesswraxjwwe",
+    },
+  });
+
+  const OTP = Math.floor(1000 + Math.random() * 9000);
+
+  const mailOptions = {
+    from: "sagarrbarthwal@gmail.com",
+    to: "miteshkumar862@gmail.com",
+    subject: "Email Verification",
+    text: `Hi your OTP for verification is ${OTP}. Please note that this OTP will get expired after 2 minutes`,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+      // do something useful
+    }
   });
 
   try {
     await User.save();
-    res.status(200).send({ message: "User created successfully", user: User });
+    res.status(400).send({ message: "User created successfully" });
   } catch (error) {
     res.status(404).send("Some Error Occured");
   }
