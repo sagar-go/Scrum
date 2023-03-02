@@ -16,7 +16,7 @@ const authRegister = async (req, res) => {
     email: req.body.email.toLowerCase(),
   });
   if (emailExists) {
-    return res.status(400).send("Email already exists");
+    return res.status(200).send({success:false,message:"Email already exists"});
   }
 
   const validRoles = Object.keys(roles);
@@ -40,7 +40,7 @@ const authRegister = async (req, res) => {
 
   try {
     await User.save();
-    res.status(200).send({ message: "User created successfully", user: User });
+    res.status(200).send({ message: "User created successfully", success:true });
   } catch (error) {
     res.status(404).send("Some Error Occured");
   }
