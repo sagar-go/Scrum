@@ -2,31 +2,30 @@ const mongoose = require("mongoose");
 
 const recordsSchema = new mongoose.Schema({
   manager: {
-    type: String,
+    name: {
+      type: String,
+    },
+    id: {
+      type: String,
+    },
   },
   status: {
     type: String,
     required: true,
   },
   devId: {
-    type: String,
+    name: {
+      type: String,
+    },
+    id: {
+      type: String,
+    },
   },
   task: {
     type: String,
     required: true,
   },
-  // toDO: {
-  //   type: String,
-  // },
-  // inProgress: {
-  //   type: String,
-  // },
-  // codeReview: {
-  //   type: String,
-  // },
-  // completed: {
-  //   type: String,
-  // },
+  createdAt: { type: Date },
 });
 
 module.exports = mongoose.model("Records", recordsSchema);
