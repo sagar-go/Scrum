@@ -28,6 +28,15 @@ const authSchema = new mongoose.Schema({
       type: String,
     },
   },
+  otp: {
+    value: {
+      type: String,
+    },
+    otpTime: { type: Number },
+  },
+  isVerified: {
+    type: Boolean,
+  },
 });
 
 module.exports = mongoose.model("User", authSchema);

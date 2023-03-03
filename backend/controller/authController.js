@@ -2,7 +2,16 @@ const authUser = require("../models/auth");
 const { signUpSchema } = require("../validationSchemas");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 const { jwtDecode, roles } = require("../utils/util");
+
+var transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "sagarrbarthwal@gmail.com",
+    pass: "gfcntesswraxjwwe",
+  },
+});
 
 const authRegister = async (req, res) => {
   const { error } = signUpSchema.validate(req.body);
@@ -15,7 +24,9 @@ const authRegister = async (req, res) => {
     email: req.body.email.toLowerCase(),
   });
   if (emailExists) {
-    return res.status(400).send("Email already exists");
+    return res
+      .status(200)
+      .send({ message: "Email already exists", success: false });
   }
 
   const validRoles = Object.keys(roles);
@@ -26,30 +37,106 @@ const authRegister = async (req, res) => {
   const salt = await bcrypt.genSalt(5); //complexity of salt generation
   const hashpassword = await bcrypt.hash(req.body.password, salt); // password hashing
 
+  var d1 = new Date(),
+    d2 = new Date(d1);
+  let otpTime = d2.setMinutes(d1.getMinutes() + 1);
+
   const User = new authUser({
     email: req.body.email.toLowerCase(),
     password: hashpassword,
     role: req.body.role,
     name: req.body.name,
     manager: req.body.manager ? req.body.manager : null,
-    token: null,
+    isVerified: false,
+    otp: { otpTime: otpTime, value: Math.floor(1000 + Math.random() * 9000) },
+  });
+  console.log(User, "asdasd");
+  try {
+    let myUser = await User.save();
+    res.status(400).send({
+      message: "User created successfully",
+      success: true,
+      otp: myUser.otp.value,
+      id: myUser._id,
+    });
+
+    const mailOptions = {
+      from: "sagarrbarthwal@gmail.com",
+      to: myUser.email,
+      subject: "Email Verification",
+      text: `Hi your OTP for verification is ${myUser.otp.value}. Please note that this OTP will get expired after 2 minutes`,
+      // html: '<a href="www.google.com">Click this link to verify your account</a>',
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log("Email sent: " + info.response);
+        // do something useful
+      }
+    });
+  } catch (error) {
+    res.status(404).send("Some Error Occured");
+  }
+};
+
+const otpVerify = async (req, res) => {
+  const loggedUser = await authUser.findOne({
+    _id: req.body.id,
   });
 
-  var transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: "sagarrbarthwal@gmail.com",
-      pass: "gfcntesswraxjwwe",
+  if (!loggedUser) {
+    return res.status(404).send({ message: "USER DOES NOT exist" });
+  }
+
+  var d3 = new Date(),
+    d4 = new Date(d3);
+  let otpTIme2 = d4.setMinutes(d3.getMinutes());
+
+  if (otpTIme2 > loggedUser.otp.otpTime) {
+    return res.status(200).send({ message: "Time expired", success: false });
+  }
+
+  if (loggedUser.otp.value === req.body.otp) {
+    await authUser.findByIdAndUpdate(
+      { _id: req.body.id },
+      { isVerified: true }
+    );
+    return res.status(200).send({ message: "SUCCESSFUL", success: true });
+  } else {
+    return res.status(200).send({ message: "Wrong OTP", success: false });
+  }
+};
+
+const resendOtp = async (req, res) => {
+  const loggedUser = await authUser.findOne({
+    _id: req.body.id,
+  });
+
+  if (!loggedUser) {
+    return res.status(404).send({ message: "USER DOES NOT exist" });
+  }
+
+  var d1 = new Date(),
+    d2 = new Date(d1);
+  let otpTime = d2.setMinutes(d1.getMinutes() + 1);
+
+  const updateUser = await authUser.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
+      "otp.value": Math.floor(1000 + Math.random() * 9000),
+      "otp.otpTime": otpTime,
     },
-  });
-
-  const OTP = Math.floor(1000 + Math.random() * 9000);
+    { returnDocument: "after" }
+  );
 
   const mailOptions = {
     from: "sagarrbarthwal@gmail.com",
-    to: "miteshkumar862@gmail.com",
-    subject: "Email Verification",
-    text: `Hi your OTP for verification is ${OTP}. Please note that this OTP will get expired after 2 minutes`,
+    to: loggedUser.email,
+    subject: "Resend OTP Text",
+    text: `Hi your OTP for verification is ${updateUser.otp.value}. Please note that this OTP will get expired after 2 minutes`,
+    // html: '<a href="www.google.com">Click this link to verify your account</a>',
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
@@ -60,13 +147,7 @@ const authRegister = async (req, res) => {
       // do something useful
     }
   });
-
-  try {
-    await User.save();
-    res.status(400).send({ message: "User created successfully" });
-  } catch (error) {
-    res.status(404).send("Some Error Occured");
-  }
+  return res.status(200).send({ success: true });
 };
 
 const authLogin = async (req, res) => {
@@ -84,11 +165,18 @@ const authLogin = async (req, res) => {
   );
 
   if (!validPassword) {
-    return res.status(404).send("Invalid password");
+    return res.status(404).send({ message: "Invalid password" });
   }
 
-  if (loggedUser.token !== null) {
-    return res.send("You are already logged in");
+  // if (loggedUser.token !== null) {
+  //   return res.send({ message: "You are already logged in" });
+  // }
+  if (!loggedUser.isVerified) {
+    return res.send({
+      success: false,
+      message: "User not verified",
+      id: loggedUser._id,
+    });
   }
 
   //Create token
@@ -100,8 +188,35 @@ const authLogin = async (req, res) => {
 
   await authUser.findOneAndUpdate({ _id: loggedUser._id }, { token: token });
 
-  res.send({ token: token, role: loggedUser.role });
+  return res.send({ token: token, role: loggedUser.role, success: true });
 };
+
+const forgotPassword = async (req, res) => {
+  const loggedUser = await authUser.findById({
+    _id: req.body.id,
+  });
+
+  const mailOptions = {
+    from: "sagarrbarthwal@gmail.com",
+    to: loggedUser.email,
+    subject: "Resend OTP Text",
+    // text: `Hi your OTP for verification is ${updateUser.otp.value}. Please note that this OTP will get expired after 2 minutes`,
+    html: `<p> Please click on this <a href=www.google.com/${loggedUser._id}>link</a> to verify your account </p>`,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+      // do something useful
+    }
+  });
+
+  return res.send({ message: "success", success: true });
+};
+
+const updatePassword = async (req, res) => {};
 
 const authLogout = async (req, res) => {
   //   console.log(req.headers["auth-token"], "header");
@@ -125,4 +240,12 @@ const authLogout = async (req, res) => {
   return res.send("Logout success");
 };
 
-module.exports = { authRegister, authLogin, authLogout };
+module.exports = {
+  authRegister,
+  authLogin,
+  authLogout,
+  otpVerify,
+  resendOtp,
+  forgotPassword,
+  updatePassword,
+};
