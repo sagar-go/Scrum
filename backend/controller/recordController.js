@@ -1,6 +1,9 @@
 const recordsDB = require("../models/record");
 const { jwtDecode } = require("../utils/util");
 const authUser = require("../models/auth");
+var nodemailer = require("nodemailer");
+
+const getOTP = async (req, res, next) => {};
 
 const createRecords = async (req, res) => {
   let tokenHeader = req.headers["auth-token"];
@@ -46,4 +49,4 @@ const getRecords = async (req, res) => {
   }
 };
 
-module.exports = { getRecords, createRecords };
+module.exports = { getRecords, createRecords, getOTP };
