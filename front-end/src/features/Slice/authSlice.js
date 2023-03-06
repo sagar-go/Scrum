@@ -12,7 +12,7 @@ const initialState = {
   data: [],
   names: {},
   error: "",
-  message: "",
+  otpMessage: [],
 };
 
 const authSlice = createSlice({
@@ -24,10 +24,15 @@ const authSlice = createSlice({
       state.loading = true;
       console.log("pending");
     },
+    // [userRegister.fulfilled]: (state, action) => {
+    //   console.log(action.payload.data.message, "fulfilled");
+    //   state.loading = false;
+    //   // state.message = action.payload.data.message;
+    // },
     [userRegister.fulfilled]: (state, action) => {
-      console.log(action.payload.data.message, "fulfilled");
-      state.loading = false;
-      // state.message = action.payload.data.message;
+      console.log(action.payload.data, "fulfilled");
+      // state.loading = false;
+      state.otpMessage = action.payload.data;
     },
     [userRegister.rejected]: (state, action) => {
       console.log(action.payload, "rejected");

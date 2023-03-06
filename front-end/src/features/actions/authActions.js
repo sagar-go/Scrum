@@ -4,10 +4,19 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 export const userRegister = createAsyncThunk(
   "userRegister/auth/register",
   async (data) => {
-    console.log(data, "dddddddddddddd");
+    //console.log(data, "dddddddddddddd");
     const response = await instanceApi.post("auth/register", data);
-    console.log(response, "sssssssssss");
+    //  console.log(response.data, "sssssssssss");
     return response;
+  }
+);
+
+export const userOtpVerify = createAsyncThunk(
+  "userOtpVerify/auth/otpverify",
+  async ({ data, id }) => {
+    console.log(data, id, "wwwwwwwww");
+    const response = await instanceApi.post(`auth/otpverify${id}`, data);
+    console.log(response, "bbbbbbbbb");
   }
 );
 
