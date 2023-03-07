@@ -6,6 +6,7 @@ const {
   otpVerify,
   resendOtp,
   forgotPassword,
+  updatePassword,
 } = require("../controller/authController");
 const {
   getLeadDetails,
@@ -23,5 +24,6 @@ router.get("/getTeamDetails", getTeamDetails);
 router.post("/otpverify", otpVerify);
 router.post("/resendotp", resendOtp);
 router.post("/forgotpassword", forgotPassword);
+router.post("/updatepassword", updatePassword);
 
 module.exports = router;
