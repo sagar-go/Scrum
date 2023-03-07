@@ -17,7 +17,9 @@ const authRegister = async (req, res) => {
   const { error } = signUpSchema.validate(req.body);
 
   if (error) {
-    return res.status(400).send(error.details[0].message);
+    return res
+      .status(400)
+      .send({ message: error.details[0].message, success: false });
   }
 
   const emailExists = await authUser.findOne({
@@ -31,7 +33,9 @@ const authRegister = async (req, res) => {
 
   const validRoles = Object.keys(roles);
   if (!validRoles.includes(req.body.role)) {
-    return res.status(400).send("Role does not exist");
+    return res
+      .status(400)
+      .send({ success: false, message: "Role does not exist" });
   }
 
   const salt = await bcrypt.genSalt(5); //complexity of salt generation
@@ -77,7 +81,7 @@ const authRegister = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(404).send("Some Error Occured");
+    res.status(404).send({ message: "Some Error Occured", success: false });
   }
 };
 
@@ -87,7 +91,9 @@ const otpVerify = async (req, res) => {
   });
 
   if (!loggedUser) {
-    return res.status(404).send({ message: "USER DOES NOT exist" });
+    return res
+      .status(404)
+      .send({ message: "USER DOES NOT exist", success: false });
   }
 
   var d3 = new Date(),
@@ -189,6 +195,59 @@ const authLogin = async (req, res) => {
   await authUser.findOneAndUpdate({ _id: loggedUser._id }, { token: token });
 
   return res.send({ token: token, role: loggedUser.role, success: true });
+
+};
+
+const forgotPassword = async (req, res) => {
+  const loggedUser = await authUser.findOne({
+    email: req.body.email,
+  });
+
+  const mailOptions = {
+    from: "sagarrbarthwal@gmail.com",
+    to: loggedUser.email,
+    subject: "Resend OTP Text",
+    // text: `Hi your OTP for verification is ${updateUser.otp.value}. Please note that this OTP will get expired after 2 minutes`,
+    html: `<p> Please click on this <a href=www.google.com/${loggedUser._id}>link</a> to change your password. </p>`,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+      // do something useful
+    }
+  });
+
+  return res.send({ message: "success", success: true });
+};
+
+const updatePassword = async (req, res) => {
+  const loggedUser = await authUser.findById({
+    _id: req.body.id,
+  });
+
+  if (!loggedUser) {
+    return res.status(400).send({ message: "User not found", success: false });
+  }
+
+  const salt = await bcrypt.genSalt(5); //complexity of salt generation
+  const hashpassword = await bcrypt.hash(req.body.password, salt);
+
+  const updateUser = await authUser.findByIdAndUpdate(
+    { _id: req.body.id },
+    {
+      password: hashpassword,
+    },
+    { returnDocument: "after" }
+  );
+
+  return res
+    .status(200)
+    .send({ message: "Password updated successfully", success: true });
+
+
 };
 
 const forgotPassword = async (req, res) => {
