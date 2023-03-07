@@ -27,7 +27,7 @@ const authRegister = async (req, res) => {
   });
   if (emailExists) {
     return res
-      .status(400)
+      .status(200)
       .send({ message: "Email already exists", success: false });
   }
 
@@ -195,6 +195,7 @@ const authLogin = async (req, res) => {
   await authUser.findOneAndUpdate({ _id: loggedUser._id }, { token: token });
 
   return res.send({ token: token, role: loggedUser.role, success: true });
+
 };
 
 const forgotPassword = async (req, res) => {
@@ -245,7 +246,36 @@ const updatePassword = async (req, res) => {
   return res
     .status(200)
     .send({ message: "Password updated successfully", success: true });
+
+
 };
+
+const forgotPassword = async (req, res) => {
+  const loggedUser = await authUser.findById({
+    _id: req.body.id,
+  });
+
+  const mailOptions = {
+    from: "sagarrbarthwal@gmail.com",
+    to: loggedUser.email,
+    subject: "Resend OTP Text",
+    // text: `Hi your OTP for verification is ${updateUser.otp.value}. Please note that this OTP will get expired after 2 minutes`,
+    html: `<p> Please click on this <a href=www.google.com/${loggedUser._id}>link</a> to verify your account </p>`,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+      // do something useful
+    }
+  });
+
+  return res.send({ message: "success", success: true });
+};
+
+const updatePassword = async (req, res) => {};
 
 const authLogout = async (req, res) => {
   //   console.log(req.headers["auth-token"], "header");

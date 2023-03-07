@@ -24,7 +24,7 @@ const authSchema = new mongoose.Schema({
     name: {
       type: String,
     },
-    id: {
+    _id: {
       type: String,
     },
   },
