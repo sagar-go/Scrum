@@ -4,37 +4,56 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 export const userRegister = createAsyncThunk(
   "userRegister/auth/register",
   async (data) => {
-    //console.log(data, "dddddddddddddd");
     const response = await instanceApi.post("auth/register", data);
-    //  console.log(response.data, "sssssssssss");
     return response;
   }
 );
 
 export const userOtpVerify = createAsyncThunk(
   "userOtpVerify/auth/otpverify",
-  async ({ data, id }) => {
-    console.log(data, id, "wwwwwwwww");
-    const response = await instanceApi.post(`auth/otpverify${id}`, data);
-    console.log(response, "bbbbbbbbb");
+  async ({ otp, id }) => {
+    const response = await instanceApi.post("auth/otpverify/", {
+      otp,
+      id,
+    });
+    return response.data;
   }
 );
 
-export const userRegisterName = createAsyncThunk(
-  "userRegisterName/auth/getRole",
+export const resendOtp = createAsyncThunk(
+  "resendOtp/auth/resendotp",
   async (data) => {
-    const response = await instanceApi.post("auth/getRole", data);
-    console.log(response.data, "uuuuuuuuuuu");
-    return response.data;
+    const response = await instanceApi.post("auth/resendotp", data);
+    return response;
   }
 );
 
 export const userLogin = createAsyncThunk(
   "userLogin/auth/login",
   async (data) => {
-    console.log(data, "wwwwwwww");
-    const response = await instanceApi.post("auth/login", data);
-    console.log(response.data, "login");
+    // const response = await
+    return (
+      instanceApi
+        .post("auth/login", data)
+        // .then((res) => console.log(res.data, "vvvvvvvvvv"))
+        .then((response) => {
+          console.log(response.data, "vvvvvvvvvv");
+          return response?.data;
+        })
+        .catch((error) => {
+          console.log(error?.response?.data, "ewwerwewrrw");
+          throw new Error(error?.response?.data, console.log("errrrrrrrrr"));
+        })
+    );
+
+    // console.log(error.response.data, "sdsdsdsd");
+    // return response.data;
+  }
+);
+export const userRegisterName = createAsyncThunk(
+  "userRegisterName/auth/",
+  async (data) => {
+    const response = await instanceApi.post("auth/getRole", data);
     return response.data;
   }
 );

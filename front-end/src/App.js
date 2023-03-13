@@ -1,21 +1,43 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Signup from "./Components/Signup";
 import Login from "./Components/Login";
-import User from "./Components/User";
 import Register from "./Components/Register";
 import OtpVerify from "./Components/OtpVerify";
+import Home from "./Components/Home";
+import Navbar from "./Components/Navbar";
+import { useState } from "react";
+import Protected from "./Components/Protected";
 
 function App() {
+  // const [isLoggedIn, setisLoggedIn] = useState(null);
+  // const logIn = () => {
+  //   setisLoggedIn(true);
+  // };
+  // const logOut = () => {
+  //   setisLoggedIn(false);
+  // };
   return (
     <div className="App">
       <Router>
+        {/* <Navbar /> */}
+        {/* {isLoggedIn ? (
+          <button onClick={logOut}>Logout</button>
+        ) : (
+          <button onClick={logIn}>Login</button>
+        )} */}
         <Routes>
-          {/* <Route path="/" element={<Signup />} /> */}
           <Route path="/" element={<Register />} />
-          <Route path="/otpverify" element={<OtpVerify />} />
+          <Route path="/otpverify/:id" element={<OtpVerify />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/user" element={<User />} />
+          <Route path="/home" element={<Home />} />
+          {/* <Route
+            path="/home"
+            element={
+              <Protected isLoggedIn={isLoggedIn}>
+                <Home />
+              </Protected>
+            }
+          /> */}
         </Routes>
       </Router>
     </div>

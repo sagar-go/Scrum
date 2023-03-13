@@ -1,6 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  resendOtp,
   userLogin,
+  userOtpVerify,
   userRegister,
   userRegisterName,
 } from "../actions/authActions";
@@ -13,6 +15,10 @@ const initialState = {
   names: {},
   error: "",
   otpMessage: [],
+  otpConfirmation: "",
+  loginData: [],
+  resendOtpMsg: "",
+  loginErrMsg: "",
 };
 
 const authSlice = createSlice({
@@ -24,11 +30,7 @@ const authSlice = createSlice({
       state.loading = true;
       console.log("pending");
     },
-    // [userRegister.fulfilled]: (state, action) => {
-    //   console.log(action.payload.data.message, "fulfilled");
-    //   state.loading = false;
-    //   // state.message = action.payload.data.message;
-    // },
+
     [userRegister.fulfilled]: (state, action) => {
       console.log(action.payload.data, "fulfilled");
       // state.loading = false;
@@ -36,6 +38,20 @@ const authSlice = createSlice({
     },
     [userRegister.rejected]: (state, action) => {
       console.log(action.payload, "rejected");
+    },
+    [userOtpVerify.pending]: (state) => {
+      console.log("pending");
+    },
+    [userOtpVerify.fulfilled]: (state, action) => {
+      console.log(action.payload, "otpConfirmation");
+      state.otpConfirmation = action.payload;
+    },
+    [userOtpVerify.rejected]: (state, action) => {
+      console.log(action.payload, "rejected");
+    },
+    [resendOtp.fulfilled]: (state, action) => {
+      console.log(action.payload, "jjjjjjjjjjjj");
+      state.resendOtpMsg = action.payload;
     },
     [userRegisterName.pending]: (state) => {
       console.log("pending");
@@ -50,14 +66,17 @@ const authSlice = createSlice({
     [userRegister.rejected]: (state, action) => {
       console.log(action.payload, "rejected");
     },
-    [userLogin.pending]: (state) => {
+    [userLogin?.pending]: (state) => {
       console.log("pending");
     },
-    [userLogin.fulfilled]: (state, action) => {
-      console.log(action.payload, "fulfilleduser");
+    [userLogin?.fulfilled]: (state, action) => {
+      console.log(action.payload, "fulfillasdadasdeduser");
+      state.loginData = action.payload;
     },
-    [userLogin.rejected]: (state, action) => {
-      console.log(action.payload, "rejected");
+    [userLogin?.rejected]: (state, action) => {
+      // console.log(action.error, "rejasasasected");
+      console.log(action.message, "dsdsdsdsdsd");
+      state.loginErrMsg = action.error.message;
     },
   },
 });

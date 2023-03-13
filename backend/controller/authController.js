@@ -53,7 +53,7 @@ const authRegister = async (req, res) => {
   console.log(User, "asdasd");
   try {
     let myUser = await User.save();
-    res.status(400).send({
+    res.status(200).send({
       message: "User created successfully",
       success: true,
       otp: myUser.otp.value,
@@ -165,7 +165,7 @@ const authLogin = async (req, res) => {
   );
 
   if (!validPassword) {
-    return res.status(404).send({ message: "Invalid password" });
+    return res.status(404).send("Invalid password");
   }
 
   // if (loggedUser.token !== null) {

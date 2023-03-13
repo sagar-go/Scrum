@@ -18,7 +18,7 @@ router.post("/register", authRegister);
 router.post("/login", authLogin);
 
 router.post("/logout", verifyToken2, authLogout);
-router.get("/getRole", getLeadDetails);
+router.post("/getRole", getLeadDetails);
 router.get("/getTeamDetails", getTeamDetails);
 router.post("/otpverify", otpVerify);
 router.post("/resendotp", resendOtp);

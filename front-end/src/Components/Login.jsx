@@ -1,23 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Field, Form } from "react-final-form";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 import { userLogin } from "../features/actions/authActions";
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  //  const userLogin = useSelector((state) => state?.authData?.)
+  const userLoginDetails = useSelector((state) => state?.authData?.loginData);
+  const errorMessage = useSelector((state) => state?.authData?.loginErrMsg);
 
-  const onSubmit = (values) => {
-    console.log(values, "fffffff");
+  function onSubmit(values) {
+    dispatch(userLogin(values));
 
-    dispatch(
-      userLogin({
-        email: "mitesh2@gmail.com",
-        password: "1",
-      })
-    );
-  };
+    if (userLoginDetails?.success === true) {
+      localStorage.setItem("auth-token", userLoginDetails?.token);
+      // toast.success("success");
+      navigate("/user");
+    } else {
+      // if (errorMessage) {
+      toast.error(errorMessage);
+      //}
+    }
+  }
 
   return (
     <div>
@@ -65,6 +72,7 @@ const Login = () => {
           )}
         />
       </div>
+      <ToastContainer />
     </div>
   );
 };
