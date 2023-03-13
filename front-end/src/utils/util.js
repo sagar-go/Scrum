@@ -6,3 +6,7 @@ export const getToken = () => {
   }
   return token;
 };
+
+export const logOut = () => {
+  if (typeof window !== "undefined") window.localStorage.clear();
+};
